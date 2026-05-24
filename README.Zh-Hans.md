@@ -1,5 +1,7 @@
 # CMCC PZ-L8 OpenWrt 固件
 
+[English](README.md)
+
 为中国移动 PZ-L8 路由器编译的带 Wi-Fi 支持的 OpenWrt 固件，提供两种版本：
 * **AP 模式** — 适用于接入点部署
 * **路由模式** — 适用于主路由使用
