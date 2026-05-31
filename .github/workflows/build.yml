@@ -195,7 +195,8 @@ jobs:
 
       - name: Clone PassWall and Dependencies
         run: |
-          cd package
+          mkdir -p ${{ github.workspace }}/package
+          cd ${{ github.workspace }}/package
           git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall.git
           git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git
           mv openwrt-passwall-packages/* .
