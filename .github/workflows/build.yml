@@ -44,8 +44,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - mode: AP
-            mode_lower: ap
+#          - mode: AP
+#            mode_lower: ap
           - mode: Router
             mode_lower: router
 
@@ -182,6 +182,11 @@ jobs:
           ccache --set-config=compression=true
           ccache -z
 
+      - name: Add Custom Feeds (PassWall)
+        run: |
+          echo 'src-git passwall_packages https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git;main' >> feeds.conf.default
+          echo 'src-git passwall_luci https://github.com/Openwrt-Passwall/openwrt-passwall.git;main' >> feeds.conf.default
+
       - name: Update feeds
         working-directory: openwrt
         run: |
@@ -256,12 +261,6 @@ jobs:
       - name: Checkout this repo
         uses: actions/checkout@v4
 
-      - name: Download AP artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: openwrt-AP
-          path: artifacts/ap/
-
       - name: Download Router artifacts
         uses: actions/download-artifact@v4
         with:
@@ -271,16 +270,6 @@ jobs:
       - name: Prepare release files
         run: |
           mkdir -p release
-
-          for f in artifacts/ap/*-sysupgrade.bin; do
-            [ -f "$f" ] && cp "$f" "release/openwrt-pz-l8-sysupgrade-ap.bin"
-          done
-          for f in artifacts/ap/*-factory.ubi; do
-            [ -f "$f" ] && cp "$f" "release/openwrt-pz-l8-factory-ap.ubi"
-          done
-          for f in artifacts/ap/*-initramfs*.itb; do
-            [ -f "$f" ] && cp "$f" "release/openwrt-pz-l8-initramfs-ap.itb"
-          done
 
           for f in artifacts/router/*-sysupgrade.bin; do
             [ -f "$f" ] && cp "$f" "release/openwrt-pz-l8-sysupgrade-router.bin"
