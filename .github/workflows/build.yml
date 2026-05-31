@@ -180,28 +180,19 @@ jobs:
           ccache --set-config=compression=true
           ccache -z
 
-      - name: Add Custom Feeds (PassWall)
+      - name: Inject PassWall and Dependencies directly into OpenWrt Source
         run: |
-          echo 'src-git passwall_packages https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git;main' >> feeds.conf.default
-          echo 'src-git passwall_luci https://github.com/Openwrt-Passwall/openwrt-passwall.git;main' >> feeds.conf.default
+          cd openwrt/package
+          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall.git
+          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git
+          mv openwrt-passwall-packages/* .
+          rm -rf openwrt-passwall-packages
 
       - name: Update feeds
         working-directory: openwrt
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-
-      # ... 前面的下载源码、更新常规 feeds 等步骤 ...
-
-      - name: Clone PassWall and Dependencies
-        run: |
-          mkdir -p ${{ github.workspace }}/package
-          cd ${{ github.workspace }}/package
-          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall.git
-          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git
-          mv openwrt-passwall-packages/* .
-          rm -rf openwrt-passwall-packages
-          cd ..
 
       - name: Generate configuration
         working-directory: openwrt
