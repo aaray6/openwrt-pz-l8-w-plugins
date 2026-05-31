@@ -44,8 +44,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-#          - mode: AP
-#            mode_lower: ap
           - mode: Router
             mode_lower: router
 
@@ -193,10 +191,33 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
+      # ... 前面的下载源码、更新常规 feeds 等步骤 ...
+
+      - name: Clone PassWall and Dependencies
+        run: |
+          cd package
+          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall.git
+          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git
+          mv openwrt-passwall-packages/* .
+          rm -rf openwrt-passwall-packages
+          cd ..
+
       - name: Generate configuration
         working-directory: openwrt
         run: |
           cp "$GITHUB_WORKSPACE/variants/${{ matrix.mode_lower }}/${{ matrix.mode_lower }}.config" .config
+
+          echo "CONFIG_PACKAGE_kmod-nft-tproxy=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-nft-nat=y" >> .config
+          echo "CONFIG_PACKAGE_nftables-json=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-ip-nftables=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-nft-core=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-passwall=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-passwall_Nftables_Transparent_Proxy=y" >> .config
+          echo "CONFIG_PACKAGE_xray-core=y" >> .config
+          echo "CONFIG_PACKAGE_v2ray-geoip-mini=y" >> .config
+          echo "CONFIG_PACKAGE_v2ray-geosite-mini=y" >> .config
+
           make defconfig
           make defconfig
 
